@@ -11,7 +11,8 @@ import java.time.LocalDate;
 
 public class StockManagement {
 
-    public static void display(Stage primaryStage, Scene menuScene, Product[] products, int totalProducts) {
+    // Display the contents of the products in the array/list
+    public static void displayProducts(Stage primaryStage, Scene menuScene, Product[] products, int totalProducts) {
         GridPane root = new GridPane();
         int counterx = 0;
         int countery = 0;
@@ -201,6 +202,16 @@ public class StockManagement {
         });
     }
 
+    // Add stock values to each identified product
+    public static void addStock(Stage primaryStage, Scene menuScene, Product[] products, int totalProducts) {
+        modifyStockUI(primaryStage, menuScene, products, totalProducts, true);
+    }
+
+    // Deduct stock values to each identified product
+    public static void deductStock(Stage primaryStage, Scene menuScene, Product[] products, int totalProducts) {
+        modifyStockUI(primaryStage, menuScene, products, totalProducts, false);
+    }
+
     private static Label createCell(String text) {
         Label label = new Label(text);
         label.setStyle("-fx-padding: 5px;"); // Padding for visual spacing
@@ -213,7 +224,8 @@ public class StockManagement {
         return label;
     }
 
-    public static void discontinueUI(Stage primaryStage, Scene menuScene, Product[] products, int totalProducts) {
+    // Allow user to set the status of a product
+    public static void setProductStatus(Stage primaryStage, Scene menuScene, Product[] products, int totalProducts) {
         GridPane root = new GridPane();
         int counterx = 0;
         int countery = 0;
@@ -300,6 +312,221 @@ public class StockManagement {
                 }
             }
             primaryStage.setScene(menuScene);
+        });
+    }
+
+    // 1. Get the maximum number of products the user wishes to store
+    public static void getMaxProducts(Stage primaryStage, Scene menuScene, String userId, Product[] productsArray, int[] totalProductsRef) {
+        javafx.scene.layout.VBox nextRoot = new javafx.scene.layout.VBox(20);
+        javafx.scene.layout.HBox buttons = new javafx.scene.layout.HBox();
+        javafx.scene.control.Button yes = new javafx.scene.control.Button("Yes");
+        javafx.scene.control.Button no = new javafx.scene.control.Button("no");
+        Label welcomeLabel = new Label("Welcome, " + userId + "! do you wanna add new product?");
+        javafx.scene.control.TextField inputamount = new javafx.scene.control.TextField("");
+
+        buttons.getChildren().addAll(yes, no);
+        buttons.setAlignment(javafx.geometry.Pos.CENTER);
+        javafx.scene.layout.HBox.setMargin(yes, new javafx.geometry.Insets(0, 20, 0, 0));
+        yes.setPrefSize(80, 40);
+        no.setPrefSize(80, 40);
+        yes.setStyle("-fx-background-color: green");
+        no.setStyle("-fx-background-color: red");
+
+        nextRoot.setAlignment(javafx.geometry.Pos.CENTER);
+        nextRoot.getChildren().addAll(welcomeLabel, buttons);
+        Scene nextScene = new Scene(nextRoot, 610, 340);
+        primaryStage.setScene(nextScene);
+
+        yes.setOnAction(event -> {
+            welcomeLabel.setText("how many product do you wanna add?");
+            nextRoot.getChildren().remove(buttons);
+            nextRoot.getChildren().add(inputamount);
+
+            inputamount.setOnAction(amountEvent -> {
+                try {
+                    int amount = Integer.parseInt(inputamount.getText());
+                    if (amount > 0) {
+                        addRefrigeratorOrTV(primaryStage, menuScene, productsArray, totalProductsRef, amount, 1);
+                    }
+                } catch (NumberFormatException ex) {
+                    welcomeLabel.setText("Invalid number! how many product do you wanna add?");
+                }
+            });
+        });
+
+        no.setOnAction(noaction -> {
+            primaryStage.setScene(menuScene);
+        });
+    }
+
+    // 3. Display the menu of the system
+    public static void displayMenu(javafx.scene.layout.VBox root, javafx.scene.layout.StackPane[] boxes, javafx.scene.control.Button[] buttonsarr, Label title, String userId, Stage primaryStage) {
+        title.setText("Hi " + userId + ", Welcome to Stock Management System");
+        
+        // Add Exit Button to the top right of the menu page
+        javafx.scene.layout.HBox topBar = new javafx.scene.layout.HBox();
+        topBar.setAlignment(javafx.geometry.Pos.TOP_RIGHT);
+        topBar.setPadding(new javafx.geometry.Insets(10));
+        javafx.scene.control.Button exitBtn = new javafx.scene.control.Button("Exit");
+        exitBtn.setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-font-weight: bold;");
+        exitBtn.setOnAction(exitEvent -> primaryStage.close());
+        topBar.getChildren().add(exitBtn);
+        root.getChildren().add(0, topBar);
+
+        boxes[0].getChildren().add(buttonsarr[0]);
+        boxes[1].getChildren().add(buttonsarr[1]);
+        boxes[2].getChildren().add(buttonsarr[2]);
+        boxes[3].getChildren().add(buttonsarr[3]);
+        for (javafx.scene.control.Button allbutton : buttonsarr) {
+            allbutton.setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        }
+    }
+
+    // Execute the appropriate methods (switch-case equivalent)
+    public static void executeMenuChoice(javafx.scene.control.Button[] buttonsarr, Stage primaryStage, Scene menuScene, Product[] products, int[] totalProductsRef) {
+        buttonsarr[0].setOnAction(viewaction -> {
+            displayProducts(primaryStage, menuScene, products, totalProductsRef[0]);
+        });
+
+        buttonsarr[1].setOnAction(addaction -> {
+            addStock(primaryStage, menuScene, products, totalProductsRef[0]);
+        });
+
+        buttonsarr[2].setOnAction(deductaction -> {
+            deductStock(primaryStage, menuScene, products, totalProductsRef[0]);
+        });
+
+        buttonsarr[3].setOnAction(discontinueaction -> {
+            setProductStatus(primaryStage, menuScene, products, totalProductsRef[0]);
+        });
+    }
+
+    // Allow user to add a refrigerator or TV product
+    public static void addRefrigeratorOrTV(Stage primaryStage, Scene scene2, Product[] productsArray, int[] totalProductsRef, int totalToAdd, int currentIteration) {
+        if (currentIteration > totalToAdd) {
+            javafx.scene.layout.VBox doneBox = new javafx.scene.layout.VBox(20);
+            javafx.scene.control.Button proceed = new javafx.scene.control.Button("proceed");
+            doneBox.setAlignment(javafx.geometry.Pos.CENTER);
+            doneBox.getChildren().addAll(new Label("Successfully added " + totalToAdd + " products!"), proceed);
+            primaryStage.setScene(new Scene(doneBox, 610, 340));
+            proceed.setOnAction(proceedaction -> {
+                primaryStage.setScene(scene2);
+            });
+            return;
+        }
+
+        javafx.scene.layout.VBox layout = new javafx.scene.layout.VBox(10);
+        layout.setAlignment(javafx.geometry.Pos.CENTER);
+        Label title = new Label("Product " + currentIteration + " of " + totalToAdd + " - Choose Type:");
+
+        javafx.scene.control.Button btnFridge = new javafx.scene.control.Button("Refrigerator");
+        javafx.scene.control.Button btnTV = new javafx.scene.control.Button("TV");
+
+        javafx.scene.layout.HBox typeBox = new javafx.scene.layout.HBox(10);
+        typeBox.setAlignment(javafx.geometry.Pos.CENTER);
+        typeBox.getChildren().addAll(btnFridge, btnTV);
+
+        layout.getChildren().addAll(title, typeBox);
+        Scene scene = new Scene(layout, 610, 340);
+        primaryStage.setScene(scene);
+
+        btnFridge.setOnAction(e -> addRefrigerator(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration));
+        btnTV.setOnAction(e -> addTV(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration));
+    }
+
+    // Add product for refrigerator
+    public static void addRefrigerator(Stage primaryStage, Scene scene2, Product[] productsArray, int[] totalProductsRef, int totalToAdd, int currentIteration) {
+        javafx.scene.layout.VBox layout = new javafx.scene.layout.VBox(10);
+        layout.setAlignment(javafx.geometry.Pos.CENTER);
+        layout.setPadding(new javafx.geometry.Insets(20));
+        Label title = new Label("Adding Refrigerator (" + currentIteration + "/" + totalToAdd + ")");
+
+        javafx.scene.control.TextField fName = new javafx.scene.control.TextField();
+        fName.setPromptText("Name");
+        javafx.scene.control.TextField fItemNum = new javafx.scene.control.TextField();
+        fItemNum.setPromptText("Item Number");
+        javafx.scene.control.TextField fQty = new javafx.scene.control.TextField();
+        fQty.setPromptText("Quantity");
+        javafx.scene.control.TextField fPrice = new javafx.scene.control.TextField();
+        fPrice.setPromptText("Price");
+        javafx.scene.control.TextField fDoor = new javafx.scene.control.TextField();
+        fDoor.setPromptText("Door Design");
+        javafx.scene.control.TextField fColor = new javafx.scene.control.TextField();
+        fColor.setPromptText("Color");
+        javafx.scene.control.TextField fCap = new javafx.scene.control.TextField();
+        fCap.setPromptText("Capacity (int)");
+
+        javafx.scene.control.Button btnSave = new javafx.scene.control.Button("Save Refrigerator");
+
+        layout.getChildren().addAll(title, fName, fItemNum, fQty, fPrice, fDoor, fColor, fCap, btnSave);
+        Scene scene = new Scene(layout, 610, 340);
+        primaryStage.setScene(scene);
+
+        btnSave.setOnAction(e -> {
+            try {
+                String name = fName.getText();
+                String itemNum = fItemNum.getText();
+                int qty = Integer.parseInt(fQty.getText());
+                double price = Double.parseDouble(fPrice.getText());
+                String door = fDoor.getText();
+                String color = fColor.getText();
+                int cap = Integer.parseInt(fCap.getText());
+
+                productsArray[totalProductsRef[0]] = new Refrigerator(itemNum, name, qty, price, door, color, cap);
+                totalProductsRef[0]++;
+
+                addRefrigeratorOrTV(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration + 1);
+            } catch (Exception ex) {
+                title.setText("Invalid input! Please check your numbers.");
+            }
+        });
+    }
+
+    // Add product for TV
+    public static void addTV(Stage primaryStage, Scene scene2, Product[] productsArray, int[] totalProductsRef, int totalToAdd, int currentIteration) {
+        javafx.scene.layout.VBox layout = new javafx.scene.layout.VBox(10);
+        layout.setAlignment(javafx.geometry.Pos.CENTER);
+        layout.setPadding(new javafx.geometry.Insets(20));
+        Label title = new Label("Adding TV (" + currentIteration + "/" + totalToAdd + ")");
+
+        javafx.scene.control.TextField fName = new javafx.scene.control.TextField();
+        fName.setPromptText("Name");
+        javafx.scene.control.TextField fItemNum = new javafx.scene.control.TextField();
+        fItemNum.setPromptText("Item Number");
+        javafx.scene.control.TextField fQty = new javafx.scene.control.TextField();
+        fQty.setPromptText("Quantity");
+        javafx.scene.control.TextField fPrice = new javafx.scene.control.TextField();
+        fPrice.setPromptText("Price");
+        javafx.scene.control.TextField fScreen = new javafx.scene.control.TextField();
+        fScreen.setPromptText("Screen Type");
+        javafx.scene.control.TextField fRes = new javafx.scene.control.TextField();
+        fRes.setPromptText("Resolution");
+        javafx.scene.control.TextField fSize = new javafx.scene.control.TextField();
+        fSize.setPromptText("Display Size");
+
+        javafx.scene.control.Button btnSave = new javafx.scene.control.Button("Save TV");
+
+        layout.getChildren().addAll(title, fName, fItemNum, fQty, fPrice, fScreen, fRes, fSize, btnSave);
+        Scene scene = new Scene(layout, 610, 340);
+        primaryStage.setScene(scene);
+
+        btnSave.setOnAction(e -> {
+            try {
+                String name = fName.getText();
+                String itemNum = fItemNum.getText();
+                int qty = Integer.parseInt(fQty.getText());
+                double price = Double.parseDouble(fPrice.getText());
+                String screen = fScreen.getText();
+                String res = fRes.getText();
+                String size = fSize.getText();
+
+                productsArray[totalProductsRef[0]] = new TV(itemNum, name, qty, price, screen, res, size);
+                totalProductsRef[0]++;
+
+                addRefrigeratorOrTV(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration + 1);
+            } catch (Exception ex) {
+                title.setText("Invalid input! Please check your numbers.");
+            }
         });
     }
 }
