@@ -41,7 +41,7 @@ public class TV extends Product {
 
     @Override
     public String toString() {
-        return "Item number : " + itemNumber() +
+        return "Item number : " + getItemNumber() +
                 "\nProduct name : " + getName() +
                 "\nScreen type : " + screenType +
                 "\nResolution : " + resolution +
