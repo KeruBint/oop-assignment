@@ -1,0 +1,23 @@
+@font-face {
+    font-family: 'Ultimate Serial Xlight';
+    src: url("fonnts.com-ultimate_serial-xlight.otf");
+
+}
+
+.root {
+    -fx-font-family: 'FSP DEMO - ltmt Srl Xlght';
+    -fx-background-color: #121212;
+}
+
+.label {
+    -fx-text-fill: #FFFFFF;
+}
+
+.title {
+    -fx-font-size: 20px;
+
+}
+
+.person {
+    -fx-background-color: #f6f8f7;
+}
