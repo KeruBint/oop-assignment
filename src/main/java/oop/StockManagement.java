@@ -176,6 +176,7 @@ public class StockManagement {
         btnFan.setOnAction(e -> addFan(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration));
     }
 
+    //check constraint for each field, if valid add to array and move to next product, else show error message and stay on same product
     private static void showProductForm(Stage primaryStage, Scene scene2, Product[] productsArray, int[] totalProductsRef, int totalToAdd, int currentIteration, String productType, String[] fieldPrompts, FormSubmitAction submitAction) {
         VBox mainBg = new VBox();
         mainBg.setStyle(BG_COLOR);
@@ -228,21 +229,38 @@ public class StockManagement {
 
         final boolean checkVal = hasCheckbox;
         btnSave.setOnAction(e -> {
+         
+            if (fName.getText().trim().isEmpty() || fItemNum.getText().trim().isEmpty() || 
+                fQty.getText().trim().isEmpty() || fPrice.getText().trim().isEmpty()) {
+                errorLabel.setText("Error: All standard fields must be filled out!");
+                return; 
+            }
+            for (TextField customField : customFields) {
+                if (customField != null && customField.getText().trim().isEmpty()) {
+                    errorLabel.setText("Error: All specification fields must be filled out!");
+                    return; 
+                }
+            }
+            
             try {
-                String name = fName.getText();
-                String itemNum = fItemNum.getText();
-                int qty = Integer.parseInt(fQty.getText());
-                double price = Double.parseDouble(fPrice.getText());
+                String name = fName.getText().trim();
+                String itemNum = fItemNum.getText().trim();
+                int qty = Integer.parseInt(fQty.getText().trim());
+                double price = Double.parseDouble(fPrice.getText().trim());
                 
                 submitAction.submit(name, itemNum, qty, price, customFields, checkVal ? customCheck.isSelected() : false);
                 
                 totalProductsRef[0]++;
                 addWhat(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration + 1);
+            } catch (NumberFormatException ex) {
+
+                errorLabel.setText("Error: Quantity and Price must be valid numbers.");
             } catch (Exception ex) {
-                errorLabel.setText("Invalid input! Please check your numbers.");
+                errorLabel.setText("Invalid input! Please check your values.");
             }
-        });
+    });
     }
+    
 
     interface FormSubmitAction {
         void submit(String name, String itemNum, int qty, double price, TextField[] customFields, boolean checkStatus);
