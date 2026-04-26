@@ -1,207 +1,422 @@
 package oop;
 
-import java.util.Arrays;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import java.time.LocalDate;
 
 public class StockManagement {
 
-    // Display the contents of the products in the array/list
-    public static void displayProducts(Stage primaryStage, Scene menuScene, Product[] products, int totalProducts) {
-        GridPane root = new GridPane();
-        int counterx = 0;
-        int countery = 0;
+    // UI Styling
+    private static final String BG_COLOR = "-fx-background-color: #f4f7f6;";
+    private static final String CARD_STYLE = "-fx-background-color: white; -fx-background-radius: 10px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 5);";
+    private static final String BTN_PRIMARY = "-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5px; -fx-cursor: hand; -fx-padding: 8px 15px;";
+    private static final String BTN_SUCCESS = "-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5px; -fx-cursor: hand; -fx-padding: 8px 15px;";
+    private static final String BTN_DANGER = "-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5px; -fx-cursor: hand; -fx-padding: 8px 15px;";
+    private static final String INPUT_STYLE = "-fx-padding: 8px; -fx-background-radius: 5px; -fx-border-radius: 5px; -fx-border-color: #bdc3c7; -fx-border-width: 1px; -fx-background-color: white;";
 
-        javafx.scene.layout.VBox mainLayout = new javafx.scene.layout.VBox(10);
-        javafx.scene.control.Button backBtn = new javafx.scene.control.Button("Back to Menu");
-        backBtn.setOnAction(e -> primaryStage.setScene(menuScene));
+    // Main Menu
 
-        mainLayout.getChildren().addAll(backBtn, root);
-        mainLayout.setPadding(new javafx.geometry.Insets(10));
+    public static void displayMenu(VBox root, StackPane[] boxes, Button[] buttonsarr, Label title, String userId, Stage primaryStage) {
+        title.setText("Hi " + userId + ",\nWhat would you like to do?");
+        title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-text-alignment: center;");
+        
+        HBox topBar = new HBox();
+        topBar.setAlignment(Pos.TOP_RIGHT);
+        topBar.setPadding(new Insets(10));
+        Button exitBtn = new Button("Exit Application");
+        exitBtn.setStyle(BTN_DANGER);
+        exitBtn.setOnAction(exitEvent -> primaryStage.close());
+        topBar.getChildren().add(exitBtn);
+        root.getChildren().add(0, topBar);
 
-        primaryStage.setScene(new Scene(mainLayout, 1220, 680));
-
-        // Add borders to all individual cells
-        root.setGridLinesVisible(true);
-
-        // Make GridPane have consistent sizing for columns
-        for (int i = 0; i < 11; i++) {
-            javafx.scene.layout.ColumnConstraints cc = new javafx.scene.layout.ColumnConstraints();
-            cc.setPercentWidth(100.0 / 11.0);
-            root.getColumnConstraints().add(cc);
+        for (int i = 0; i < 4; i++) {
+            boxes[i].getChildren().clear(); 
+            boxes[i].getChildren().add(buttonsarr[i]);
+            buttonsarr[i].setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            buttonsarr[i].setStyle("-fx-background-color: transparent; -fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2980b9; -fx-cursor: hand;");
         }
-
-        // Add header row
-        String[] headers = { "No.", "Type", "Item Num", "Name", "Design/Screen", "Color/Res", "Capacity/Size",
-                "Quantity", "Price", "Total Value", "Status" };
-        for (int i = 0; i < headers.length; i++) {
-            Label headerLabel = createCell(headers[i]);
-            headerLabel.setStyle("-fx-padding: 5px; -fx-font-weight: bold; -fx-background-color: lightgray;");
-            headerLabel.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE); // To make background color fill the cell
-            root.add(headerLabel, counterx++, countery);
-        }
-        countery++; // Move to the next row for products
-
-        for (int i = 0; i < totalProducts; i++) {
-            counterx = 0; // Reset column counter for the new row
-            if (products[i] instanceof Refrigerator) {
-                Refrigerator fridge = (Refrigerator) products[i];
-                root.add(createCell(String.valueOf(countery)), counterx++, countery);
-                root.add(createCell("Refrigerator"), counterx++, countery);
-                root.add(createCell(fridge.getItemNumber()), counterx++, countery);
-                root.add(createCell(fridge.getName()), counterx++, countery);
-                root.add(createCell(fridge.getDoorDesign()), counterx++, countery);
-                root.add(createCell(fridge.getColor()), counterx++, countery);
-                root.add(createCell(String.valueOf(fridge.getCapacity())), counterx++, countery);
-                root.add(createCell(String.valueOf(fridge.getQuantity())), counterx++, countery);
-                root.add(createCell(String.valueOf(fridge.getPrice())), counterx++, countery);
-                root.add(createCell(String.valueOf(fridge.getTotalValue())), counterx++, countery);
-                root.add(createStatusCell(fridge.getStatus()), counterx++, countery);
-                countery++;
-            } else if (products[i] instanceof TV) {
-                TV tv = (TV) products[i];
-                root.add(createCell(String.valueOf(countery)), counterx++, countery);
-                root.add(createCell("TV"), counterx++, countery);
-                root.add(createCell(tv.getItemNumber()), counterx++, countery);
-                root.add(createCell(tv.getName()), counterx++, countery);
-                root.add(createCell(tv.getScreenType()), counterx++, countery);
-                root.add(createCell(tv.getResolution()), counterx++, countery);
-                root.add(createCell(tv.getDisplaySize()), counterx++, countery);
-                root.add(createCell(String.valueOf(tv.getQuantity())), counterx++, countery);
-                root.add(createCell(String.valueOf(tv.getPrice())), counterx++, countery);
-                root.add(createCell(String.valueOf(tv.getTotalValue())), counterx++, countery);
-                root.add(createStatusCell(tv.getStatus()), counterx++, countery);
-                countery++;
-            } else if (products[i] instanceof AirConditioner) {
-                AirConditioner ac = (AirConditioner) products[i];
-                root.add(createCell(String.valueOf(countery)), counterx++, countery);
-                root.add(createCell("Air Conditioner"), counterx++, countery);
-                root.add(createCell(ac.getItemNumber()), counterx++, countery);
-                root.add(createCell(ac.getName()), counterx++, countery);
-                root.add(createCell(ac.getCoolingCapacity()), counterx++, countery);
-                root.add(createCell(ac.getEnergyRating()), counterx++, countery);
-                root.add(createCell(ac.isInverter() ? "Yes" : "No"), counterx++, countery);
-                root.add(createCell(String.valueOf(ac.getQuantity())), counterx++, countery);
-                root.add(createCell(String.valueOf(ac.getPrice())), counterx++, countery);
-                root.add(createCell(String.valueOf(ac.getTotalValue())), counterx++, countery);
-                root.add(createStatusCell(ac.getStatus()), counterx++, countery);
-                countery++;
-            } else if (products[i] instanceof Fan) {
-                Fan fan = (Fan) products[i];
-                root.add(createCell(String.valueOf(countery)), counterx++, countery);
-                root.add(createCell("Fan"), counterx++, countery);
-                root.add(createCell(fan.getItemNumber()), counterx++, countery);
-                root.add(createCell(fan.getName()), counterx++, countery);
-                root.add(createCell(fan.getSpeed()), counterx++, countery);
-                root.add(createCell(fan.getSize()), counterx++, countery);
-                root.add(createCell(fan.isOscillation() ? "Yes" : "No"), counterx++, countery);
-                root.add(createCell(String.valueOf(fan.getQuantity())), counterx++, countery);
-                root.add(createCell(String.valueOf(fan.getPrice())), counterx++, countery);
-                root.add(createCell(String.valueOf(fan.getTotalValue())), counterx++, countery);
-                root.add(createStatusCell(fan.getStatus()), counterx++, countery);
-                countery++;
-            } else if (products[i] instanceof Microwave) {
-                Microwave mw = (Microwave) products[i];
-                root.add(createCell(String.valueOf(countery)), counterx++, countery);
-                root.add(createCell("Microwave"), counterx++, countery);
-                root.add(createCell(mw.getItemNumber()), counterx++, countery);
-                root.add(createCell(mw.getName()), counterx++, countery);
-                root.add(createCell(mw.getPower()), counterx++, countery);
-                root.add(createCell(mw.getCapacity()), counterx++, countery);
-                root.add(createCell(mw.isChildLock() ? "Yes" : "No"), counterx++, countery);
-                root.add(createCell(String.valueOf(mw.getQuantity())), counterx++, countery);
-                root.add(createCell(String.valueOf(mw.getPrice())), counterx++, countery);
-                root.add(createCell(String.valueOf(mw.getTotalValue())), counterx++, countery);
-                root.add(createStatusCell(mw.getStatus()), counterx++, countery);
-                countery++;
-            }
-        }
-
     }
 
-    public static void modifyStockUI(Stage primaryStage, Scene menuScene, Product[] products, int totalProducts, boolean isAdd) {
-        GridPane root = new GridPane();
-        int counterx = 0;
-        int countery = 0;
+    public static void executeMenuChoice(Button[] buttonsarr, Stage primaryStage, Scene menuScene, Product[] products, int[] totalProductsRef) {
+        buttonsarr[0].setOnAction(e -> displayProducts(primaryStage, menuScene, products, totalProductsRef[0]));
+        buttonsarr[1].setOnAction(e -> addStock(primaryStage, menuScene, products, totalProductsRef[0]));
+        buttonsarr[2].setOnAction(e -> deductStock(primaryStage, menuScene, products, totalProductsRef[0]));
+        buttonsarr[3].setOnAction(e -> setProductStatus(primaryStage, menuScene, products, totalProductsRef[0]));
+    }
 
-        javafx.scene.layout.VBox mainLayout = new javafx.scene.layout.VBox(10);
-        javafx.scene.control.Button backBtn = new javafx.scene.control.Button("Back to Menu");
-        backBtn.setOnAction(e -> primaryStage.setScene(menuScene));
+    public static void getMaxProducts(Stage primaryStage, Scene menuScene, String userId, Product[] productsArray, int[] totalProductsRef) {
+        VBox mainBg = new VBox();
+        mainBg.setStyle(BG_COLOR);
+        mainBg.setAlignment(Pos.CENTER);
 
-        javafx.scene.layout.HBox bottomBar = new javafx.scene.layout.HBox(10);
-        bottomBar.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
-        javafx.scene.control.Button actionBtn = new javafx.scene.control.Button(isAdd ? "Confirm Add Stock" : "Confirm Deduct Stock");
-        bottomBar.getChildren().add(actionBtn);
+        VBox card = new VBox(20);
+        card.setStyle(CARD_STYLE);
+        card.setPadding(new Insets(30));
+        card.setAlignment(Pos.CENTER);
+        card.setMaxWidth(400);
 
-        mainLayout.getChildren().addAll(backBtn, root, bottomBar);
-        mainLayout.setPadding(new javafx.geometry.Insets(10));
+        Label welcomeLabel = new Label("Welcome, " + userId + "!\nDo you want to add new products?");
+        welcomeLabel.setStyle("-fx-font-size: 18px; -fx-text-alignment: center; -fx-font-weight: bold;");
+        welcomeLabel.setAlignment(Pos.CENTER);
+        welcomeLabel.setWrapText(true); // FIX: Ensures text doesn't cut off with "..."
 
-        primaryStage.setScene(new Scene(mainLayout, 1220, 680));
+        HBox buttons = new HBox(20);
+        buttons.setAlignment(Pos.CENTER);
+        Button yes = new Button("Yes, Add Items");
+        Button no = new Button("No, Go to Menu");
+        yes.setStyle(BTN_SUCCESS);
+        no.setStyle(BTN_PRIMARY);
+        buttons.getChildren().addAll(yes, no);
 
-        root.setGridLinesVisible(true);
+        TextField inputamount = new TextField();
+        inputamount.setPromptText("Enter amount...");
+        inputamount.setStyle(INPUT_STYLE);
+        inputamount.setMaxWidth(150);
 
-        for (int i = 0; i < 12; i++) {
-            javafx.scene.layout.ColumnConstraints cc = new javafx.scene.layout.ColumnConstraints();
-            cc.setPercentWidth(100.0 / 12.0);
-            root.getColumnConstraints().add(cc);
+        card.getChildren().addAll(welcomeLabel, buttons);
+        mainBg.getChildren().add(card);
+        
+        primaryStage.setScene(new Scene(mainBg, 900, 500));
+
+        yes.setOnAction(event -> {
+            welcomeLabel.setText("How many products do you want to add?");
+            card.getChildren().remove(buttons);
+            card.getChildren().add(inputamount);
+
+            inputamount.setOnAction(amountEvent -> {
+                try {
+                    int amount = Integer.parseInt(inputamount.getText());
+                    if (amount > 0) {
+                        addWhat(primaryStage, menuScene, productsArray, totalProductsRef, amount, 1);
+                    }
+                } catch (NumberFormatException ex) {
+                    welcomeLabel.setText("Invalid number! How many products?");
+                    welcomeLabel.setStyle("-fx-font-size: 16px; -fx-text-alignment: center; -fx-font-weight: bold; -fx-text-fill: red;");
+                }
+            });
+        });
+
+        no.setOnAction(e -> primaryStage.setScene(menuScene));
+    }
+
+
+    // Products
+    public static void addWhat(Stage primaryStage, Scene scene2, Product[] productsArray, int[] totalProductsRef, int totalToAdd, int currentIteration) {
+        if (currentIteration > totalToAdd) {
+            VBox mainBg = new VBox();
+            mainBg.setStyle(BG_COLOR);
+            mainBg.setAlignment(Pos.CENTER);
+            
+            VBox card = new VBox(20);
+            card.setStyle(CARD_STYLE);
+            card.setPadding(new Insets(40));
+            card.setAlignment(Pos.CENTER);
+
+            Label successLabel = new Label("Successfully added " + totalToAdd + " products!");
+            successLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #27ae60;");
+            
+            Button proceed = new Button("Proceed to Menu");
+            proceed.setStyle(BTN_PRIMARY);
+            proceed.setOnAction(e -> primaryStage.setScene(scene2));
+
+            card.getChildren().addAll(successLabel, proceed);
+            mainBg.getChildren().add(card);
+            primaryStage.setScene(new Scene(mainBg, 900, 500));
+            return;
         }
 
-        String[] headers = { "No.", "Type", "Item Num", "Name", "Design/Screen", "Color/Res", "Capacity/Size",
-                "Quantity", "Price", "Total Value", "Status", isAdd ? "Add Amount" : "Deduct Amount" };
-        for (int i = 0; i < headers.length; i++) {
-            Label headerLabel = createCell(headers[i]);
-            headerLabel.setStyle("-fx-padding: 5px; -fx-font-weight: bold; -fx-background-color: lightgray;");
-            headerLabel.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-            root.add(headerLabel, counterx++, countery);
+        VBox mainBg = new VBox();
+        mainBg.setStyle(BG_COLOR);
+        mainBg.setAlignment(Pos.CENTER);
+
+        VBox card = new VBox(20);
+        card.setStyle(CARD_STYLE);
+        card.setPadding(new Insets(30));
+        card.setAlignment(Pos.CENTER);
+
+        Label title = new Label("Product " + currentIteration + " of " + totalToAdd + "\nChoose Product Type:");
+        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-alignment: center;");
+
+        HBox typeBox = new HBox(15);
+        typeBox.setAlignment(Pos.CENTER);
+        
+        Button btnFridge = new Button("Refrigerator");
+        Button btnTV = new Button("TV");
+        Button btnMicrowave = new Button("Microwave");
+        Button btnAC = new Button("Air Conditioner");
+        Button btnFan = new Button("Fan");
+
+        Button[] typeBtns = {btnFridge, btnTV, btnMicrowave, btnAC, btnFan};
+        for(Button btn : typeBtns) {
+            btn.setStyle(BTN_PRIMARY);
         }
-        countery++;
 
-        javafx.scene.control.TextField[] inputFields = new javafx.scene.control.TextField[totalProducts];
+        typeBox.getChildren().addAll(typeBtns);
+        card.getChildren().addAll(title, typeBox);
+        mainBg.getChildren().add(card);
+        
+        primaryStage.setScene(new Scene(mainBg, 900, 500));
 
-        for (int i = 0; i < totalProducts; i++) {
-            counterx = 0;
-            Product p = products[i];
-            
-            String noStr = String.valueOf(countery);
-            String typeStr = p instanceof Refrigerator ? "Refrigerator" : (p instanceof TV ? "TV" : "Unknown");
-            String itemNum = p.getItemNumber();
-            String name = p.getName();
-            String spec1 = p instanceof Refrigerator ? ((Refrigerator) p).getDoorDesign() : ((TV) p).getScreenType();
-            String spec2 = p instanceof Refrigerator ? ((Refrigerator) p).getColor() : ((TV) p).getResolution();
-            String spec3 = p instanceof Refrigerator ? String.valueOf(((Refrigerator) p).getCapacity()) : ((TV) p).getDisplaySize();
-            String qty = String.valueOf(p.getQuantity());
-            String price = String.valueOf(p.getPrice());
-            String total = String.valueOf(p.getTotalValue());
-            
-            root.add(createCell(noStr), counterx++, countery);
-            root.add(createCell(typeStr), counterx++, countery);
-            root.add(createCell(itemNum), counterx++, countery);
-            root.add(createCell(name), counterx++, countery);
-            root.add(createCell(spec1), counterx++, countery);
-            root.add(createCell(spec2), counterx++, countery);
-            root.add(createCell(spec3), counterx++, countery);
-            root.add(createCell(qty), counterx++, countery);
-            root.add(createCell(price), counterx++, countery);
-            root.add(createCell(total), counterx++, countery);
-            root.add(createStatusCell(p.getStatus()), counterx++, countery);
-            
-            javafx.scene.control.TextField inputField = new javafx.scene.control.TextField();
-            inputField.setPromptText("0");
-            if (!p.getStatus()) {
-                inputField.setDisable(true);
+        btnFridge.setOnAction(e -> addRefrigerator(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration));
+        btnTV.setOnAction(e -> addTV(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration));
+        btnMicrowave.setOnAction(e -> addMicrowave(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration));
+        btnAC.setOnAction(e -> addAirConditioner(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration));
+        btnFan.setOnAction(e -> addFan(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration));
+    }
+
+    private static void showProductForm(Stage primaryStage, Scene scene2, Product[] productsArray, int[] totalProductsRef, int totalToAdd, int currentIteration, String productType, String[] fieldPrompts, FormSubmitAction submitAction) {
+        VBox mainBg = new VBox();
+        mainBg.setStyle(BG_COLOR);
+        mainBg.setAlignment(Pos.CENTER);
+
+        VBox card = new VBox(15);
+        card.setStyle(CARD_STYLE);
+        card.setPadding(new Insets(30));
+        card.setAlignment(Pos.CENTER);
+        card.setMaxWidth(500);
+
+        Label title = new Label("Adding " + productType + " (" + currentIteration + "/" + totalToAdd + ")");
+        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+        TextField fName = createStyledTextField("Product Name");
+        TextField fItemNum = createStyledTextField("Item Number");
+        TextField fQty = createStyledTextField("Quantity");
+        TextField fPrice = createStyledTextField("Price");
+
+        card.getChildren().addAll(title, fName, fItemNum, fQty, fPrice);
+
+        TextField[] customFields = new TextField[fieldPrompts.length];
+        for (int i = 0; i < fieldPrompts.length; i++) {
+            if (!fieldPrompts[i].startsWith("CHECKBOX:")) {
+                customFields[i] = createStyledTextField(fieldPrompts[i]);
+                card.getChildren().add(customFields[i]);
             }
-            inputFields[i] = inputField;
-            root.add(inputField, counterx++, countery);
-            
-            countery++;
+        }
+
+        CheckBox customCheck = new CheckBox();
+        boolean hasCheckbox = false;
+        for (String prompt : fieldPrompts) {
+            if (prompt.startsWith("CHECKBOX:")) {
+                customCheck.setText(prompt.replace("CHECKBOX:", ""));
+                customCheck.setStyle("-fx-font-size: 14px;");
+                card.getChildren().add(customCheck);
+                hasCheckbox = true;
+            }
         }
 
         Label errorLabel = new Label();
-        errorLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
-        bottomBar.getChildren().add(0, errorLabel); // Add error label to the left of the button
+        errorLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
+
+        Button btnSave = new Button("Save " + productType);
+        btnSave.setStyle(BTN_SUCCESS);
+        card.getChildren().addAll(errorLabel, btnSave);
+        mainBg.getChildren().add(card);
+
+        primaryStage.setScene(new Scene(mainBg, 900, 600));
+
+        final boolean checkVal = hasCheckbox;
+        btnSave.setOnAction(e -> {
+            try {
+                String name = fName.getText();
+                String itemNum = fItemNum.getText();
+                int qty = Integer.parseInt(fQty.getText());
+                double price = Double.parseDouble(fPrice.getText());
+                
+                submitAction.submit(name, itemNum, qty, price, customFields, checkVal ? customCheck.isSelected() : false);
+                
+                totalProductsRef[0]++;
+                addWhat(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration + 1);
+            } catch (Exception ex) {
+                errorLabel.setText("Invalid input! Please check your numbers.");
+            }
+        });
+    }
+
+    interface FormSubmitAction {
+        void submit(String name, String itemNum, int qty, double price, TextField[] customFields, boolean checkStatus);
+    }
+
+    private static TextField createStyledTextField(String prompt) {
+        TextField tf = new TextField();
+        tf.setPromptText(prompt);
+        tf.setStyle(INPUT_STYLE);
+        tf.setMaxWidth(300);
+        return tf;
+    }
+
+    public static void addRefrigerator(Stage primaryStage, Scene scene2, Product[] productsArray, int[] totalProductsRef, int totalToAdd, int currentIteration) {
+        showProductForm(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration, "Refrigerator", 
+            new String[]{"Door Design", "Color", "Capacity (int)"}, 
+            (name, itemNum, qty, price, fields, check) -> productsArray[totalProductsRef[0]] = new Refrigerator(itemNum, name, qty, price, fields[0].getText(), fields[1].getText(), Integer.parseInt(fields[2].getText())));
+    }
+
+    public static void addTV(Stage primaryStage, Scene scene2, Product[] productsArray, int[] totalProductsRef, int totalToAdd, int currentIteration) {
+         showProductForm(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration, "TV", 
+            new String[]{"Screen Type", "Resolution", "Display Size"}, 
+            (name, itemNum, qty, price, fields, check) -> productsArray[totalProductsRef[0]] = new TV(itemNum, name, qty, price, fields[0].getText(), fields[1].getText(), fields[2].getText()));
+    }
+
+    public static void addMicrowave(Stage primaryStage, Scene scene2, Product[] productsArray, int[] totalProductsRef, int totalToAdd, int currentIteration) {
+        showProductForm(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration, "Microwave", 
+            new String[]{"Power", "Capacity", "CHECKBOX:Child Lock"}, 
+            (name, itemNum, qty, price, fields, check) -> productsArray[totalProductsRef[0]] = new Microwave(itemNum, name, qty, price, fields[0].getText(), fields[1].getText(), check));
+    }
+
+    public static void addAirConditioner(Stage primaryStage, Scene scene2, Product[] productsArray, int[] totalProductsRef, int totalToAdd, int currentIteration) {
+        showProductForm(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration, "Air Conditioner", 
+            new String[]{"Cooling Capacity", "Energy Rating", "CHECKBOX:Inverter"}, 
+            (name, itemNum, qty, price, fields, check) -> productsArray[totalProductsRef[0]] = new AirConditioner(itemNum, name, qty, price, fields[0].getText(), fields[1].getText(), check));
+    }
+
+    public static void addFan(Stage primaryStage, Scene scene2, Product[] productsArray, int[] totalProductsRef, int totalToAdd, int currentIteration) {
+         showProductForm(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration, "Fan", 
+            new String[]{"Speed", "Size", "CHECKBOX:Oscillation"}, 
+            (name, itemNum, qty, price, fields, check) -> productsArray[totalProductsRef[0]] = new Fan(itemNum, name, qty, price, fields[0].getText(), fields[1].getText(), check));
+    }
+
+    
+    // Diaplay Tables
+    public static void displayProducts(Stage primaryStage, Scene menuScene, Product[] products, int totalProducts) {
+        VBox mainLayout = new VBox(25); 
+        mainLayout.setStyle(BG_COLOR);
+        mainLayout.setPadding(new Insets(20));
+        
+        ScrollPane scrollPane = new ScrollPane(mainLayout);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setStyle("-fx-background-color: transparent; -fx-background: #f4f7f6;");
+
+        Button backBtn = new Button("← Back to Menu");
+        backBtn.setStyle(BTN_PRIMARY);
+        backBtn.setOnAction(e -> primaryStage.setScene(menuScene));
+        mainLayout.getChildren().add(backBtn);
+
+        GridPane fridgeTable = createProductTable(new String[]{"No.", "Item Num", "Name", "Door Design", "Color", "Capacity", "Qty", "Price", "Total Value", "Status"});
+        GridPane tvTable = createProductTable(new String[]{"No.", "Item Num", "Name", "Screen Type", "Resolution", "Display Size", "Qty", "Price", "Total Value", "Status"});
+        GridPane acTable = createProductTable(new String[]{"No.", "Item Num", "Name", "Cooling Cap", "Energy Rating", "Inverter", "Qty", "Price", "Total Value", "Status"});
+        GridPane fanTable = createProductTable(new String[]{"No.", "Item Num", "Name", "Speed", "Size", "Oscillation", "Qty", "Price", "Total Value", "Status"});
+        GridPane mwTable = createProductTable(new String[]{"No.", "Item Num", "Name", "Power", "Capacity", "Child Lock", "Qty", "Price", "Total Value", "Status"});
+
+        int fRow = 1, tRow = 1, aRow = 1, fanRow = 1, mRow = 1;
+
+        for (int i = 0; i < totalProducts; i++) {
+            if (products[i] instanceof Refrigerator) {
+                Refrigerator p = (Refrigerator) products[i];
+                addTableRow(fridgeTable, fRow++, p.getItemNumber(), p.getName(), p.getDoorDesign(), p.getColor(), String.valueOf(p.getCapacity()), p.getQuantity(), p.getPrice(), p.getTotalValue(), p.getStatus());
+            } else if (products[i] instanceof TV) {
+                TV p = (TV) products[i];
+                addTableRow(tvTable, tRow++, p.getItemNumber(), p.getName(), p.getScreenType(), p.getResolution(), p.getDisplaySize(), p.getQuantity(), p.getPrice(), p.getTotalValue(), p.getStatus());
+            } else if (products[i] instanceof AirConditioner) {
+                AirConditioner p = (AirConditioner) products[i];
+                addTableRow(acTable, aRow++, p.getItemNumber(), p.getName(), p.getCoolingCapacity(), p.getEnergyRating(), p.isInverter() ? "Yes" : "No", p.getQuantity(), p.getPrice(), p.getTotalValue(), p.getStatus());
+            } else if (products[i] instanceof Fan) {
+                Fan p = (Fan) products[i];
+                addTableRow(fanTable, fanRow++, p.getItemNumber(), p.getName(), p.getSpeed(), p.getSize(), p.isOscillation() ? "Yes" : "No", p.getQuantity(), p.getPrice(), p.getTotalValue(), p.getStatus());
+            } else if (products[i] instanceof Microwave) {
+                Microwave p = (Microwave) products[i];
+                addTableRow(mwTable, mRow++, p.getItemNumber(), p.getName(), p.getPower(), p.getCapacity(), p.isChildLock() ? "Yes" : "No", p.getQuantity(), p.getPrice(), p.getTotalValue(), p.getStatus());
+            }
+        }
+
+        if (fRow > 1) addTableToLayout(mainLayout, "Refrigerators", fridgeTable);
+        if (tRow > 1) addTableToLayout(mainLayout, "Televisions", tvTable);
+        if (aRow > 1) addTableToLayout(mainLayout, "Air Conditioners", acTable);
+        if (fanRow > 1) addTableToLayout(mainLayout, "Fans", fanTable);
+        if (mRow > 1) addTableToLayout(mainLayout, "Microwaves", mwTable);
+
+        primaryStage.setScene(new Scene(scrollPane, 1220, 680));
+    }
+
+    public static void modifyStockUI(Stage primaryStage, Scene menuScene, Product[] products, int totalProducts, boolean isAdd) {
+        VBox mainLayout = new VBox(25);
+        mainLayout.setStyle(BG_COLOR);
+        mainLayout.setPadding(new Insets(20));
+
+        ScrollPane scrollPane = new ScrollPane(mainLayout);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setStyle("-fx-background-color: transparent; -fx-background: #f4f7f6;");
+
+        HBox topBar = new HBox();
+        Button backBtn = new Button("← Back to Menu");
+        backBtn.setStyle(BTN_PRIMARY);
+        backBtn.setOnAction(e -> primaryStage.setScene(menuScene));
+        topBar.getChildren().add(backBtn);
+
+        Label title = new Label(isAdd ? "Add Stock to Existing Products" : "Deduct Stock from Existing Products");
+        title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        mainLayout.getChildren().addAll(topBar, title);
+
+        String actionCol = isAdd ? "Add Amount" : "Deduct Amount";
+        
+        // FIX: Creating distinct tables for modifications so headers map correctly!
+        GridPane fridgeTable = createProductTable(new String[]{"No.", "Item Num", "Name", "Door Design", "Color", "Capacity", "Qty", "Price", "Total Value", "Status", actionCol});
+        GridPane tvTable = createProductTable(new String[]{"No.", "Item Num", "Name", "Screen Type", "Resolution", "Display Size", "Qty", "Price", "Total Value", "Status", actionCol});
+        GridPane acTable = createProductTable(new String[]{"No.", "Item Num", "Name", "Cooling Cap", "Energy Rating", "Inverter", "Qty", "Price", "Total Value", "Status", actionCol});
+        GridPane fanTable = createProductTable(new String[]{"No.", "Item Num", "Name", "Speed", "Size", "Oscillation", "Qty", "Price", "Total Value", "Status", actionCol});
+        GridPane mwTable = createProductTable(new String[]{"No.", "Item Num", "Name", "Power", "Capacity", "Child Lock", "Qty", "Price", "Total Value", "Status", actionCol});
+
+        TextField[] inputFields = new TextField[totalProducts];
+        int fRow = 1, tRow = 1, aRow = 1, fanRow = 1, mRow = 1;
+
+        for (int i = 0; i < totalProducts; i++) {
+            Product p = products[i];
+            
+            TextField inputField = new TextField();
+            inputField.setPromptText("0");
+            inputField.setStyle(INPUT_STYLE);
+            if (!p.getStatus()) inputField.setDisable(true);
+            inputFields[i] = inputField;
+
+            if (p instanceof Refrigerator) {
+                Refrigerator r = (Refrigerator) p;
+                addTableRow(fridgeTable, fRow, r.getItemNumber(), r.getName(), r.getDoorDesign(), r.getColor(), String.valueOf(r.getCapacity()), r.getQuantity(), r.getPrice(), r.getTotalValue(), r.getStatus());
+                fridgeTable.add(inputField, 10, fRow++);
+            } else if (p instanceof TV) {
+                TV t = (TV) p;
+                addTableRow(tvTable, tRow, t.getItemNumber(), t.getName(), t.getScreenType(), t.getResolution(), t.getDisplaySize(), t.getQuantity(), t.getPrice(), t.getTotalValue(), t.getStatus());
+                tvTable.add(inputField, 10, tRow++);
+            } else if (p instanceof AirConditioner) {
+                AirConditioner a = (AirConditioner) p;
+                addTableRow(acTable, aRow, a.getItemNumber(), a.getName(), a.getCoolingCapacity(), a.getEnergyRating(), a.isInverter() ? "Yes" : "No", a.getQuantity(), a.getPrice(), a.getTotalValue(), a.getStatus());
+                acTable.add(inputField, 10, aRow++);
+            } else if (p instanceof Fan) {
+                Fan f = (Fan) p;
+                addTableRow(fanTable, fanRow, f.getItemNumber(), f.getName(), f.getSpeed(), f.getSize(), f.isOscillation() ? "Yes" : "No", f.getQuantity(), f.getPrice(), f.getTotalValue(), f.getStatus());
+                fanTable.add(inputField, 10, fanRow++);
+            } else if (p instanceof Microwave) {
+                Microwave m = (Microwave) p;
+                addTableRow(mwTable, mRow, m.getItemNumber(), m.getName(), m.getPower(), m.getCapacity(), m.isChildLock() ? "Yes" : "No", m.getQuantity(), m.getPrice(), m.getTotalValue(), m.getStatus());
+                mwTable.add(inputField, 10, mRow++);
+            }
+        }
+
+        if (fRow > 1) addTableToLayout(mainLayout, "Refrigerators", fridgeTable);
+        if (tRow > 1) addTableToLayout(mainLayout, "Televisions", tvTable);
+        if (aRow > 1) addTableToLayout(mainLayout, "Air Conditioners", acTable);
+        if (fanRow > 1) addTableToLayout(mainLayout, "Fans", fanTable);
+        if (mRow > 1) addTableToLayout(mainLayout, "Microwaves", mwTable);
+
+        HBox bottomBar = new HBox(15);
+        bottomBar.setAlignment(Pos.CENTER_RIGHT);
+        Label errorLabel = new Label();
+        errorLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold; -fx-font-size: 14px;");
+        Button actionBtn = new Button(isAdd ? "Confirm Add Stock" : "Confirm Deduct Stock");
+        actionBtn.setStyle(BTN_SUCCESS);
+        bottomBar.getChildren().addAll(errorLabel, actionBtn);
+        
+        mainLayout.getChildren().add(bottomBar);
+        primaryStage.setScene(new Scene(scrollPane, 1220, 680));
 
         actionBtn.setOnAction(e -> {
             boolean hasError = false;
@@ -213,8 +428,8 @@ public class StockManagement {
                         if (amount > 0) {
                             if (!products[i].getStatus()) {
                                 hasError = true;
-                                errorLabel.setText("Error: Cannot " + (isAdd ? "add to" : "deduct from") + " discontinued product " + products[i].getName() + ".");
-                                return; // Stop and do not return to menu
+                                errorLabel.setText("Error: Cannot modify discontinued product.");
+                                return; 
                             }
                             if (isAdd) {
                                 products[i].addQuantity(amount);
@@ -223,127 +438,99 @@ public class StockManagement {
                                     products[i].deductQuantity(amount);
                                 } else {
                                     hasError = true;
-                                    errorLabel.setText("Error: Cannot deduct " + amount + " from " + products[i].getName() + ". Only " + products[i].getQuantity() + " available.");
-                                    return; // Stop and do not return to menu
+                                    errorLabel.setText("Error: Exceeds available quantity for " + products[i].getName());
+                                    return; 
                                 }
                             }
                         }
                     } catch (NumberFormatException ex) {
                         hasError = true;
                         errorLabel.setText("Error: Invalid number entered.");
-                        return; // Stop and do not return to menu
+                        return;
                     }
                 }
             }
-            
-            if (!hasError) {
-                primaryStage.setScene(menuScene);
-            }
+            if (!hasError) primaryStage.setScene(menuScene);
         });
     }
 
-    // Add stock values to each identified product
-    public static void addStock(Stage primaryStage, Scene menuScene, Product[] products, int totalProducts) {
-        modifyStockUI(primaryStage, menuScene, products, totalProducts, true);
-    }
-
-    // Deduct stock values to each identified product
-    public static void deductStock(Stage primaryStage, Scene menuScene, Product[] products, int totalProducts) {
-        modifyStockUI(primaryStage, menuScene, products, totalProducts, false);
-    }
-
-    private static Label createCell(String text) {
-        Label label = new Label(text);
-        label.setStyle("-fx-padding: 5px;"); // Padding for visual spacing
-        return label;
-    }
-
-    private static Label createStatusCell(boolean status) {
-        Label label = new Label(String.valueOf(status));
-        label.setStyle("-fx-padding: 5px; -fx-text-fill: " + (status ? "green" : "red") + "; -fx-font-weight: bold;");
-        return label;
-    }
-
-    // Allow user to set the status of a product
     public static void setProductStatus(Stage primaryStage, Scene menuScene, Product[] products, int totalProducts) {
-        GridPane root = new GridPane();
-        int counterx = 0;
-        int countery = 0;
+        VBox mainLayout = new VBox(25);
+        mainLayout.setStyle(BG_COLOR);
+        mainLayout.setPadding(new Insets(20));
 
-        javafx.scene.layout.VBox mainLayout = new javafx.scene.layout.VBox(10);
-        javafx.scene.control.Button backBtn = new javafx.scene.control.Button("Back to Menu");
+        ScrollPane scrollPane = new ScrollPane(mainLayout);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setStyle("-fx-background-color: transparent; -fx-background: #f4f7f6;");
+
+        HBox topBar = new HBox();
+        Button backBtn = new Button("← Back to Menu");
+        backBtn.setStyle(BTN_PRIMARY);
         backBtn.setOnAction(e -> primaryStage.setScene(menuScene));
+        topBar.getChildren().add(backBtn);
 
-        javafx.scene.layout.HBox bottomBar = new javafx.scene.layout.HBox(10);
-        bottomBar.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
-        javafx.scene.control.Button actionBtn = new javafx.scene.control.Button("Confirm Discontinue");
-        bottomBar.getChildren().add(actionBtn);
+        Label title = new Label("Discontinue Products");
+        title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        mainLayout.getChildren().addAll(topBar, title);
 
-        mainLayout.getChildren().addAll(backBtn, root, bottomBar);
-        mainLayout.setPadding(new javafx.geometry.Insets(10));
+        String actionCol = "Discontinue";
+        GridPane fridgeTable = createProductTable(new String[]{"No.", "Item Num", "Name", "Door Design", "Color", "Capacity", "Qty", "Price", "Total Value", "Status", actionCol});
+        GridPane tvTable = createProductTable(new String[]{"No.", "Item Num", "Name", "Screen Type", "Resolution", "Display Size", "Qty", "Price", "Total Value", "Status", actionCol});
+        GridPane acTable = createProductTable(new String[]{"No.", "Item Num", "Name", "Cooling Cap", "Energy Rating", "Inverter", "Qty", "Price", "Total Value", "Status", actionCol});
+        GridPane fanTable = createProductTable(new String[]{"No.", "Item Num", "Name", "Speed", "Size", "Oscillation", "Qty", "Price", "Total Value", "Status", actionCol});
+        GridPane mwTable = createProductTable(new String[]{"No.", "Item Num", "Name", "Power", "Capacity", "Child Lock", "Qty", "Price", "Total Value", "Status", actionCol});
 
-        primaryStage.setScene(new Scene(mainLayout, 1220, 680));
-
-        root.setGridLinesVisible(true);
-
-        for (int i = 0; i < 12; i++) {
-            javafx.scene.layout.ColumnConstraints cc = new javafx.scene.layout.ColumnConstraints();
-            cc.setPercentWidth(100.0 / 12.0);
-            root.getColumnConstraints().add(cc);
-        }
-
-        String[] headers = { "No.", "Type", "Item Num", "Name", "Design/Screen", "Color/Res", "Capacity/Size",
-                "Quantity", "Price", "Total Value", "Status", "Discontinue" };
-        for (int i = 0; i < headers.length; i++) {
-            Label headerLabel = createCell(headers[i]);
-            headerLabel.setStyle("-fx-padding: 5px; -fx-font-weight: bold; -fx-background-color: lightgray;");
-            headerLabel.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-            root.add(headerLabel, counterx++, countery);
-        }
-        countery++;
-
-        javafx.scene.control.CheckBox[] checkBoxes = new javafx.scene.control.CheckBox[totalProducts];
+        CheckBox[] checkBoxes = new CheckBox[totalProducts];
+        int fRow = 1, tRow = 1, aRow = 1, fanRow = 1, mRow = 1;
 
         for (int i = 0; i < totalProducts; i++) {
-            counterx = 0;
             Product p = products[i];
             
-            String noStr = String.valueOf(countery);
-            String typeStr = p instanceof Refrigerator ? "Refrigerator" : (p instanceof TV ? "TV" : "Unknown");
-            String itemNum = p.getItemNumber();
-            String name = p.getName();
-            String spec1 = p instanceof Refrigerator ? ((Refrigerator) p).getDoorDesign() : ((TV) p).getScreenType();
-            String spec2 = p instanceof Refrigerator ? ((Refrigerator) p).getColor() : ((TV) p).getResolution();
-            String spec3 = p instanceof Refrigerator ? String.valueOf(((Refrigerator) p).getCapacity()) : ((TV) p).getDisplaySize();
-            String qty = String.valueOf(p.getQuantity());
-            String price = String.valueOf(p.getPrice());
-            String total = String.valueOf(p.getTotalValue());
-            
-            root.add(createCell(noStr), counterx++, countery);
-            root.add(createCell(typeStr), counterx++, countery);
-            root.add(createCell(itemNum), counterx++, countery);
-            root.add(createCell(name), counterx++, countery);
-            root.add(createCell(spec1), counterx++, countery);
-            root.add(createCell(spec2), counterx++, countery);
-            root.add(createCell(spec3), counterx++, countery);
-            root.add(createCell(qty), counterx++, countery);
-            root.add(createCell(price), counterx++, countery);
-            root.add(createCell(total), counterx++, countery);
-            root.add(createStatusCell(p.getStatus()), counterx++, countery);
-            
-            javafx.scene.control.CheckBox checkBox = new javafx.scene.control.CheckBox();
-            if (!p.getStatus()) {
-                checkBox.setDisable(true);
-            }
-            javafx.scene.layout.HBox cbContainer = new javafx.scene.layout.HBox(checkBox);
-            cbContainer.setAlignment(javafx.geometry.Pos.CENTER);
-            cbContainer.setStyle("-fx-padding: 5px;");
-            
+            CheckBox checkBox = new CheckBox();
+            if (!p.getStatus()) checkBox.setDisable(true);
             checkBoxes[i] = checkBox;
-            root.add(cbContainer, counterx++, countery);
             
-            countery++;
+            HBox cbContainer = new HBox(checkBox);
+            cbContainer.setAlignment(Pos.CENTER);
+            cbContainer.setPadding(new Insets(5));
+
+            if (p instanceof Refrigerator) {
+                Refrigerator r = (Refrigerator) p;
+                addTableRow(fridgeTable, fRow, r.getItemNumber(), r.getName(), r.getDoorDesign(), r.getColor(), String.valueOf(r.getCapacity()), r.getQuantity(), r.getPrice(), r.getTotalValue(), r.getStatus());
+                fridgeTable.add(cbContainer, 10, fRow++);
+            } else if (p instanceof TV) {
+                TV t = (TV) p;
+                addTableRow(tvTable, tRow, t.getItemNumber(), t.getName(), t.getScreenType(), t.getResolution(), t.getDisplaySize(), t.getQuantity(), t.getPrice(), t.getTotalValue(), t.getStatus());
+                tvTable.add(cbContainer, 10, tRow++);
+            } else if (p instanceof AirConditioner) {
+                AirConditioner a = (AirConditioner) p;
+                addTableRow(acTable, aRow, a.getItemNumber(), a.getName(), a.getCoolingCapacity(), a.getEnergyRating(), a.isInverter() ? "Yes" : "No", a.getQuantity(), a.getPrice(), a.getTotalValue(), a.getStatus());
+                acTable.add(cbContainer, 10, aRow++);
+            } else if (p instanceof Fan) {
+                Fan f = (Fan) p;
+                addTableRow(fanTable, fanRow, f.getItemNumber(), f.getName(), f.getSpeed(), f.getSize(), f.isOscillation() ? "Yes" : "No", f.getQuantity(), f.getPrice(), f.getTotalValue(), f.getStatus());
+                fanTable.add(cbContainer, 10, fanRow++);
+            } else if (p instanceof Microwave) {
+                Microwave m = (Microwave) p;
+                addTableRow(mwTable, mRow, m.getItemNumber(), m.getName(), m.getPower(), m.getCapacity(), m.isChildLock() ? "Yes" : "No", m.getQuantity(), m.getPrice(), m.getTotalValue(), m.getStatus());
+                mwTable.add(cbContainer, 10, mRow++);
+            }
         }
+
+        if (fRow > 1) addTableToLayout(mainLayout, "Refrigerators", fridgeTable);
+        if (tRow > 1) addTableToLayout(mainLayout, "Televisions", tvTable);
+        if (aRow > 1) addTableToLayout(mainLayout, "Air Conditioners", acTable);
+        if (fanRow > 1) addTableToLayout(mainLayout, "Fans", fanTable);
+        if (mRow > 1) addTableToLayout(mainLayout, "Microwaves", mwTable);
+
+        HBox bottomBar = new HBox(15);
+        bottomBar.setAlignment(Pos.CENTER_RIGHT);
+        Button actionBtn = new Button("Confirm Discontinue");
+        actionBtn.setStyle(BTN_DANGER);
+        bottomBar.getChildren().add(actionBtn);
+
+        mainLayout.getChildren().add(bottomBar);
+        primaryStage.setScene(new Scene(scrollPane, 1220, 680));
 
         actionBtn.setOnAction(e -> {
             for (int i = 0; i < totalProducts; i++) {
@@ -355,362 +542,69 @@ public class StockManagement {
         });
     }
 
-    // 1. Get the maximum number of products the user wishes to store
-    public static void getMaxProducts(Stage primaryStage, Scene menuScene, String userId, Product[] productsArray, int[] totalProductsRef) {
-        javafx.scene.layout.VBox nextRoot = new javafx.scene.layout.VBox(20);
-        javafx.scene.layout.HBox buttons = new javafx.scene.layout.HBox();
-        javafx.scene.control.Button yes = new javafx.scene.control.Button("Yes");
-        javafx.scene.control.Button no = new javafx.scene.control.Button("no");
-        Label welcomeLabel = new Label("Welcome, " + userId + "! do you wanna add new product?");
-        javafx.scene.control.TextField inputamount = new javafx.scene.control.TextField("");
-
-        buttons.getChildren().addAll(yes, no);
-        buttons.setAlignment(javafx.geometry.Pos.CENTER);
-        javafx.scene.layout.HBox.setMargin(yes, new javafx.geometry.Insets(0, 20, 0, 0));
-        yes.setPrefSize(80, 40);
-        no.setPrefSize(80, 40);
-        yes.setStyle("-fx-background-color: green");
-        no.setStyle("-fx-background-color: red");
-
-        nextRoot.setAlignment(javafx.geometry.Pos.CENTER);
-        nextRoot.getChildren().addAll(welcomeLabel, buttons);
-        Scene nextScene = new Scene(nextRoot, 610, 340);
-        primaryStage.setScene(nextScene);
-
-        yes.setOnAction(event -> {
-            welcomeLabel.setText("how many product do you wanna add?");
-            nextRoot.getChildren().remove(buttons);
-            nextRoot.getChildren().add(inputamount);
-
-            inputamount.setOnAction(amountEvent -> {
-                try {
-                    int amount = Integer.parseInt(inputamount.getText());
-                    if (amount > 0) {
-                        addWhat(primaryStage, menuScene, productsArray, totalProductsRef, amount, 1);
-                    }
-                } catch (NumberFormatException ex) {
-                    welcomeLabel.setText("Invalid number! how many product do you wanna add?");
-                }
-            });
-        });
-
-        no.setOnAction(noaction -> {
-            primaryStage.setScene(menuScene);
-        });
+    public static void addStock(Stage primaryStage, Scene menuScene, Product[] products, int totalProducts) {
+        modifyStockUI(primaryStage, menuScene, products, totalProducts, true);
     }
 
-    // 3. Display the menu of the system
-    public static void displayMenu(javafx.scene.layout.VBox root, javafx.scene.layout.StackPane[] boxes, javafx.scene.control.Button[] buttonsarr, Label title, String userId, Stage primaryStage) {
-        title.setText("Hi " + userId + ", Welcome to Stock Management System");
-        
-        // Add Exit Button to the top right of the menu page
-        javafx.scene.layout.HBox topBar = new javafx.scene.layout.HBox();
-        topBar.setAlignment(javafx.geometry.Pos.TOP_RIGHT);
-        topBar.setPadding(new javafx.geometry.Insets(10));
-        javafx.scene.control.Button exitBtn = new javafx.scene.control.Button("Exit");
-        exitBtn.setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-font-weight: bold;");
-        exitBtn.setOnAction(exitEvent -> primaryStage.close());
-        topBar.getChildren().add(exitBtn);
-        root.getChildren().add(0, topBar);
+    public static void deductStock(Stage primaryStage, Scene menuScene, Product[] products, int totalProducts) {
+        modifyStockUI(primaryStage, menuScene, products, totalProducts, false);
+    }
 
-        boxes[0].getChildren().add(buttonsarr[0]);
-        boxes[1].getChildren().add(buttonsarr[1]);
-        boxes[2].getChildren().add(buttonsarr[2]);
-        boxes[3].getChildren().add(buttonsarr[3]);
-        for (javafx.scene.control.Button allbutton : buttonsarr) {
-            allbutton.setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE);
+    private static GridPane createProductTable(String[] headers) {
+        GridPane root = new GridPane();
+        root.setGridLinesVisible(true);
+        root.setStyle("-fx-background-color: white; -fx-border-color: #bdc3c7;");
+        for (int i = 0; i < headers.length; i++) {
+            ColumnConstraints cc = new ColumnConstraints();
+            // FIX: Removed strict PercentWidth. Instead, allow columns to grow dynamically 
+            // and give them a reasonable minimum width so text never squishes or overlaps.
+            cc.setHgrow(Priority.ALWAYS);
+            cc.setMinWidth(80); 
+            root.getColumnConstraints().add(cc);
+
+            Label headerLabel = new Label(headers[i]);
+            headerLabel.setStyle("-fx-padding: 8px; -fx-font-weight: bold; -fx-background-color: #ecf0f1; -fx-text-fill: #2c3e50;");
+            headerLabel.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            headerLabel.setAlignment(Pos.CENTER);
+            root.add(headerLabel, i, 0);
         }
+        return root;
     }
 
-    // Execute the appropriate methods (switch-case equivalent)
-    public static void executeMenuChoice(javafx.scene.control.Button[] buttonsarr, Stage primaryStage, Scene menuScene, Product[] products, int[] totalProductsRef) {
-        buttonsarr[0].setOnAction(viewaction -> {
-            displayProducts(primaryStage, menuScene, products, totalProductsRef[0]);
-        });
-
-        buttonsarr[1].setOnAction(addaction -> {
-            addStock(primaryStage, menuScene, products, totalProductsRef[0]);
-        });
-
-        buttonsarr[2].setOnAction(deductaction -> {
-            deductStock(primaryStage, menuScene, products, totalProductsRef[0]);
-        });
-
-        buttonsarr[3].setOnAction(discontinueaction -> {
-            setProductStatus(primaryStage, menuScene, products, totalProductsRef[0]);
-        });
+    private static void addTableRow(GridPane table, int rowIndex, String itemNum, String name, String spec1, String spec2, String spec3, int qty, double price, double total, boolean status) {
+        table.add(createCell(String.valueOf(rowIndex)), 0, rowIndex);
+        table.add(createCell(itemNum), 1, rowIndex);
+        table.add(createCell(name), 2, rowIndex);
+        table.add(createCell(spec1), 3, rowIndex);
+        table.add(createCell(spec2), 4, rowIndex);
+        table.add(createCell(spec3), 5, rowIndex);
+        table.add(createCell(String.valueOf(qty)), 6, rowIndex);
+        table.add(createCell(String.format("$%.2f", price)), 7, rowIndex);
+        table.add(createCell(String.format("$%.2f", total)), 8, rowIndex);
+        table.add(createStatusCell(status), 9, rowIndex);
     }
 
-    // Allow user to add a refrigerator or TV product
-    public static void addWhat(Stage primaryStage, Scene scene2, Product[] productsArray, int[] totalProductsRef, int totalToAdd, int currentIteration) {
-        if (currentIteration > totalToAdd) {
-            javafx.scene.layout.VBox doneBox = new javafx.scene.layout.VBox(20);
-            javafx.scene.control.Button proceed = new javafx.scene.control.Button("proceed");
-            doneBox.setAlignment(javafx.geometry.Pos.CENTER);
-            doneBox.getChildren().addAll(new Label("Successfully added " + totalToAdd + " products!"), proceed);
-            primaryStage.setScene(new Scene(doneBox, 610, 340));
-            proceed.setOnAction(proceedaction -> {
-                primaryStage.setScene(scene2);
-            });
-            return;
-        }
-
-        javafx.scene.layout.VBox layout = new javafx.scene.layout.VBox(10);
-        layout.setAlignment(javafx.geometry.Pos.CENTER);
-        Label title = new Label("Product " + currentIteration + " of " + totalToAdd + " - Choose Type:");
-
-        javafx.scene.control.Button btnFridge = new javafx.scene.control.Button("Refrigerator");
-        javafx.scene.control.Button btnTV = new javafx.scene.control.Button("TV");
-        javafx.scene.control.Button btnMicrowave = new javafx.scene.control.Button("Microwave");
-        javafx.scene.control.Button btnAC = new javafx.scene.control.Button("Air Conditioner");
-        javafx.scene.control.Button btnFan = new javafx.scene.control.Button("Fan");
-
-        javafx.scene.layout.HBox typeBox = new javafx.scene.layout.HBox(10);
-        typeBox.setAlignment(javafx.geometry.Pos.CENTER);
-        typeBox.getChildren().addAll(btnFridge, btnTV, btnMicrowave, btnAC, btnFan);
-
-        layout.getChildren().addAll(title, typeBox);
-        Scene scene = new Scene(layout, 610, 340);
-        primaryStage.setScene(scene);
-
-        btnFridge.setOnAction(e -> addRefrigerator(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration));
-        btnTV.setOnAction(e -> addTV(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration));
-        btnMicrowave.setOnAction(e -> addMicrowave(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration));
-        btnAC.setOnAction(e -> addAirConditioner(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration));
-        btnFan.setOnAction(e -> addFan(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration));
+    private static Label createCell(String text) {
+        Label label = new Label(text);
+        label.setStyle("-fx-padding: 8px; -fx-text-fill: #34495e;"); 
+        label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        label.setAlignment(Pos.CENTER);
+        return label;
     }
 
-    // Add product for refrigerator
-    public static void addRefrigerator(Stage primaryStage, Scene scene2, Product[] productsArray, int[] totalProductsRef, int totalToAdd, int currentIteration) {
-        javafx.scene.layout.VBox layout = new javafx.scene.layout.VBox(10);
-        layout.setAlignment(javafx.geometry.Pos.CENTER);
-        layout.setPadding(new javafx.geometry.Insets(20));
-        Label title = new Label("Adding Refrigerator (" + currentIteration + "/" + totalToAdd + ")");
-
-        javafx.scene.control.TextField fName = new javafx.scene.control.TextField();
-        fName.setPromptText("Name");
-        javafx.scene.control.TextField fItemNum = new javafx.scene.control.TextField();
-        fItemNum.setPromptText("Item Number");
-        javafx.scene.control.TextField fQty = new javafx.scene.control.TextField();
-        fQty.setPromptText("Quantity");
-        javafx.scene.control.TextField fPrice = new javafx.scene.control.TextField();
-        fPrice.setPromptText("Price");
-        javafx.scene.control.TextField fDoor = new javafx.scene.control.TextField();
-        fDoor.setPromptText("Door Design");
-        javafx.scene.control.TextField fColor = new javafx.scene.control.TextField();
-        fColor.setPromptText("Color");
-        javafx.scene.control.TextField fCap = new javafx.scene.control.TextField();
-        fCap.setPromptText("Capacity (int)");
-
-        javafx.scene.control.Button btnSave = new javafx.scene.control.Button("Save Refrigerator");
-
-        layout.getChildren().addAll(title, fName, fItemNum, fQty, fPrice, fDoor, fColor, fCap, btnSave);
-        Scene scene = new Scene(layout, 610, 340);
-        primaryStage.setScene(scene);
-
-        btnSave.setOnAction(e -> {
-            try {
-                String name = fName.getText();
-                String itemNum = fItemNum.getText();
-                int qty = Integer.parseInt(fQty.getText());
-                double price = Double.parseDouble(fPrice.getText());
-                String door = fDoor.getText();
-                String color = fColor.getText();
-                int cap = Integer.parseInt(fCap.getText());
-
-                productsArray[totalProductsRef[0]] = new Refrigerator(itemNum, name, qty, price, door, color, cap);
-                totalProductsRef[0]++;
-
-                addWhat(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration + 1);
-            } catch (Exception ex) {
-                title.setText("Invalid input! Please check your numbers.");
-            }
-        });
+    private static Label createStatusCell(boolean status) {
+        Label label = new Label(status ? "Active" : "Discontinued");
+        label.setStyle("-fx-padding: 8px; -fx-font-weight: bold; -fx-text-fill: " + (status ? "#27ae60" : "#e74c3c") + ";");
+        label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        label.setAlignment(Pos.CENTER);
+        return label;
     }
 
-    // Add product for TV
-    public static void addTV(Stage primaryStage, Scene scene2, Product[] productsArray, int[] totalProductsRef, int totalToAdd, int currentIteration) {
-        javafx.scene.layout.VBox layout = new javafx.scene.layout.VBox(10);
-        layout.setAlignment(javafx.geometry.Pos.CENTER);
-        layout.setPadding(new javafx.geometry.Insets(20));
-        Label title = new Label("Adding TV (" + currentIteration + "/" + totalToAdd + ")");
-
-        javafx.scene.control.TextField fName = new javafx.scene.control.TextField();
-        fName.setPromptText("Name");
-        javafx.scene.control.TextField fItemNum = new javafx.scene.control.TextField();
-        fItemNum.setPromptText("Item Number");
-        javafx.scene.control.TextField fQty = new javafx.scene.control.TextField();
-        fQty.setPromptText("Quantity");
-        javafx.scene.control.TextField fPrice = new javafx.scene.control.TextField();
-        fPrice.setPromptText("Price");
-        javafx.scene.control.TextField fScreen = new javafx.scene.control.TextField();
-        fScreen.setPromptText("Screen Type");
-        javafx.scene.control.TextField fRes = new javafx.scene.control.TextField();
-        fRes.setPromptText("Resolution");
-        javafx.scene.control.TextField fSize = new javafx.scene.control.TextField();
-        fSize.setPromptText("Display Size");
-
-        javafx.scene.control.Button btnSave = new javafx.scene.control.Button("Save TV");
-
-        layout.getChildren().addAll(title, fName, fItemNum, fQty, fPrice, fScreen, fRes, fSize, btnSave);
-        Scene scene = new Scene(layout, 610, 340);
-        primaryStage.setScene(scene);
-
-        btnSave.setOnAction(e -> {
-            try {
-                String name = fName.getText();
-                String itemNum = fItemNum.getText();
-                int qty = Integer.parseInt(fQty.getText());
-                double price = Double.parseDouble(fPrice.getText());
-                String screen = fScreen.getText();
-                String res = fRes.getText();
-                String size = fSize.getText();
-
-                productsArray[totalProductsRef[0]] = new TV(itemNum, name, qty, price, screen, res, size);
-                totalProductsRef[0]++;
-
-                addWhat(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration + 1);
-            } catch (Exception ex) {
-                title.setText("Invalid input! Please check your numbers.");
-            }
-        });
-    }
-
-    public static void addMicrowave(Stage primaryStage, Scene scene2, Product[] productsArray, int[] totalProductsRef, int totalToAdd, int currentIteration) {
-        javafx.scene.layout.VBox layout = new javafx.scene.layout.VBox(10);
-        layout.setAlignment(javafx.geometry.Pos.CENTER);
-        layout.setPadding(new javafx.geometry.Insets(20));
-        Label title = new Label("Adding Microwave (" + currentIteration + "/" + totalToAdd + ")");
-
-        javafx.scene.control.TextField fName = new javafx.scene.control.TextField();
-        fName.setPromptText("Name");
-        javafx.scene.control.TextField fItemNum = new javafx.scene.control.TextField();
-        fItemNum.setPromptText("Item Number");
-        javafx.scene.control.TextField fQty = new javafx.scene.control.TextField();
-        fQty.setPromptText("Quantity");
-        javafx.scene.control.TextField fPrice = new javafx.scene.control.TextField();
-        fPrice.setPromptText("Price");
-        javafx.scene.control.TextField fPower = new javafx.scene.control.TextField();
-        fPower.setPromptText("Power");
-        javafx.scene.control.TextField fCap = new javafx.scene.control.TextField();
-        fCap.setPromptText("Capacity");
-        javafx.scene.control.CheckBox cbChildLock = new javafx.scene.control.CheckBox("Child Lock");
-
-        javafx.scene.control.Button btnSave = new javafx.scene.control.Button("Save Microwave");
-
-        layout.getChildren().addAll(title, fName, fItemNum, fQty, fPrice, fPower, fCap, cbChildLock, btnSave);
-        Scene scene = new Scene(layout, 610, 400);
-        primaryStage.setScene(scene);
-
-        btnSave.setOnAction(e -> {
-            try {
-                String name = fName.getText();
-                String itemNum = fItemNum.getText();
-                int qty = Integer.parseInt(fQty.getText());
-                double price = Double.parseDouble(fPrice.getText());
-                String power = fPower.getText();
-                String cap = fCap.getText();
-                boolean childLock = cbChildLock.isSelected();
-
-                productsArray[totalProductsRef[0]] = new Microwave(itemNum, name, qty, price, power, cap, childLock);
-                totalProductsRef[0]++;
-
-                addWhat(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration + 1);
-            } catch (Exception ex) {
-                title.setText("Invalid input! Please check your numbers.");
-            }
-        });
-    }
-
-    public static void addAirConditioner(Stage primaryStage, Scene scene2, Product[] productsArray, int[] totalProductsRef, int totalToAdd, int currentIteration) {
-        javafx.scene.layout.VBox layout = new javafx.scene.layout.VBox(10);
-        layout.setAlignment(javafx.geometry.Pos.CENTER);
-        layout.setPadding(new javafx.geometry.Insets(20));
-        Label title = new Label("Adding Air Conditioner (" + currentIteration + "/" + totalToAdd + ")");
-
-        javafx.scene.control.TextField fName = new javafx.scene.control.TextField();
-        fName.setPromptText("Name");
-        javafx.scene.control.TextField fItemNum = new javafx.scene.control.TextField();
-        fItemNum.setPromptText("Item Number");
-        javafx.scene.control.TextField fQty = new javafx.scene.control.TextField();
-        fQty.setPromptText("Quantity");
-        javafx.scene.control.TextField fPrice = new javafx.scene.control.TextField();
-        fPrice.setPromptText("Price");
-        javafx.scene.control.TextField fCoolingCap = new javafx.scene.control.TextField();
-        fCoolingCap.setPromptText("Cooling Capacity");
-        javafx.scene.control.TextField fEnergyRating = new javafx.scene.control.TextField();
-        fEnergyRating.setPromptText("Energy Rating");
-        javafx.scene.control.CheckBox cbInverter = new javafx.scene.control.CheckBox("Inverter");
-
-        javafx.scene.control.Button btnSave = new javafx.scene.control.Button("Save Air Conditioner");
-
-        layout.getChildren().addAll(title, fName, fItemNum, fQty, fPrice, fCoolingCap, fEnergyRating, cbInverter, btnSave);
-        Scene scene = new Scene(layout, 610, 400);
-        primaryStage.setScene(scene);
-
-        btnSave.setOnAction(e -> {
-            try {
-                String name = fName.getText();
-                String itemNum = fItemNum.getText();
-                int qty = Integer.parseInt(fQty.getText());
-                double price = Double.parseDouble(fPrice.getText());
-                String coolingCap = fCoolingCap.getText();
-                String energyRating = fEnergyRating.getText();
-                boolean inverter = cbInverter.isSelected();
-
-                productsArray[totalProductsRef[0]] = new AirConditioner(itemNum, name, qty, price, coolingCap, energyRating, inverter);
-                totalProductsRef[0]++;
-
-                addWhat(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration + 1);
-            } catch (Exception ex) {
-                title.setText("Invalid input! Please check your numbers.");
-            }
-        });
-    }
-
-    public static void addFan(Stage primaryStage, Scene scene2, Product[] productsArray, int[] totalProductsRef, int totalToAdd, int currentIteration) {
-        javafx.scene.layout.VBox layout = new javafx.scene.layout.VBox(10);
-        layout.setAlignment(javafx.geometry.Pos.CENTER);
-        layout.setPadding(new javafx.geometry.Insets(20));
-        Label title = new Label("Adding Fan (" + currentIteration + "/" + totalToAdd + ")");
-
-        javafx.scene.control.TextField fName = new javafx.scene.control.TextField();
-        fName.setPromptText("Name");
-        javafx.scene.control.TextField fItemNum = new javafx.scene.control.TextField();
-        fItemNum.setPromptText("Item Number");
-        javafx.scene.control.TextField fQty = new javafx.scene.control.TextField();
-        fQty.setPromptText("Quantity");
-        javafx.scene.control.TextField fPrice = new javafx.scene.control.TextField();
-        fPrice.setPromptText("Price");
-        javafx.scene.control.TextField fSpeed = new javafx.scene.control.TextField();
-        fSpeed.setPromptText("Speed");
-        javafx.scene.control.TextField fSize = new javafx.scene.control.TextField();
-        fSize.setPromptText("Size");
-        javafx.scene.control.CheckBox cbOscillation = new javafx.scene.control.CheckBox("Oscillation");
-
-        javafx.scene.control.Button btnSave = new javafx.scene.control.Button("Save Fan");
-
-        layout.getChildren().addAll(title, fName, fItemNum, fQty, fPrice, fSpeed, fSize, cbOscillation, btnSave);
-        Scene scene = new Scene(layout, 610, 400);
-        primaryStage.setScene(scene);
-
-        btnSave.setOnAction(e -> {
-            try {
-                String name = fName.getText();
-                String itemNum = fItemNum.getText();
-                int qty = Integer.parseInt(fQty.getText());
-                double price = Double.parseDouble(fPrice.getText());
-                String speed = fSpeed.getText();
-                String size = fSize.getText();
-                boolean oscillation = cbOscillation.isSelected();
-
-                productsArray[totalProductsRef[0]] = new Fan(itemNum, name, qty, price, speed, size, oscillation);
-                totalProductsRef[0]++;
-
-                addWhat(primaryStage, scene2, productsArray, totalProductsRef, totalToAdd, currentIteration + 1);
-            } catch (Exception ex) {
-                title.setText("Invalid input! Please check your numbers.");
-            }
-        }); 
+    private static void addTableToLayout(VBox layout, String title, GridPane table) {
+        Label titleLabel = new Label(title);
+        titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-padding: 10px 0px 5px 0px;");
+        VBox card = new VBox(10, titleLabel, table);
+        card.setStyle(CARD_STYLE);
+        layout.getChildren().add(card);
     }
 }

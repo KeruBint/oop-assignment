@@ -19,85 +19,111 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // declaration of login scene
-        Font.loadFont(getClass().getResourceAsStream("fonnts.com-ultimate_serial-xlight.otf"), 14);
-        VBox root = new VBox();
-        Label title = new Label("Welcome to stock management system!");
-        HBox boxes = new HBox();
-        Label name = new Label("Name");
-        TextField inputname = new TextField();
-        StackPane box1 = new StackPane();
-        StackPane box2 = new StackPane();
-        StackPane box3 = new StackPane();
-        StackPane box4 = new StackPane();
-        Label timname = new Label("Chan Tim How");
-        Label weiname = new Label("Chew Wei Jiun");
-        Label kainame = new Label("Leong Kaiwen");
-        Label wongname = new Label("Wong Yu Feng");
-        // children
-        VBox.setMargin(boxes, new Insets(50, 0, 0, 0));
-        boxes.getChildren().addAll(box1, box2, box3, box4);
-        box1.setStyle("-fx-border-width:0.25;-fx-border-color:black; ");
-        box1.setPrefSize(152, 152);
-        box2.setStyle("-fx-border-width:0.25;-fx-border-color:black;");
-        box2.setPrefSize(152, 152);
-        box3.setStyle("-fx-border-width:0.25;-fx-border-color:black;");
-        box3.setPrefSize(152, 152);
-        box4.setStyle("-fx-border-width:0.25;-fx-border-color:black;");
-        box4.setPrefSize(152, 152);
-        box1.getChildren().add(timname);
-        box2.getChildren().add(weiname);
-        box3.getChildren().add(kainame);
-        box4.getChildren().add(wongname);
+        try {
+            Font.loadFont(getClass().getResourceAsStream("fonnts.com-ultimate_serial-xlight.otf"), 14);
+        } catch (Exception e) {
+            System.out.println("Could not load custom font, using default.");
+        }
 
-        // root
-        root.getChildren().addAll(title, boxes, name, inputname);
-        root.setPrefHeight(340);
-        root.setPrefWidth(610);
+        VBox root = new VBox(30); // 30px vertical spacing between elements
+        root.setPadding(new Insets(40));
         root.setAlignment(Pos.CENTER);
-        // scene
-        Scene login = new Scene(root);
-        // style
+        root.setStyle("-fx-background-color: #f4f7f6;"); // Soft light-grey/blue background
+
+        Label title = new Label("Stock Management System");
+        title.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+
+        HBox boxes = new HBox(20); // 20px horizontal spacing between cards
+        boxes.setAlignment(Pos.CENTER);
+        
+        StackPane box1 = createCard("Chan Tim How");
+        StackPane box2 = createCard("Chew Wei Jiun");
+        StackPane box3 = createCard("Leong Kaiwen");
+        StackPane box4 = createCard("Wong Yu Feng");
+        
+        boxes.getChildren().addAll(box1, box2, box3, box4);
+        VBox loginArea = new VBox(10);
+        loginArea.setAlignment(Pos.CENTER);
+        loginArea.setPadding(new Insets(20, 0, 0, 0));
+
+        Label nameLabel = new Label("Enter your name to begin:");
+        nameLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #7f8c8d;");
+
+        TextField inputname = new TextField();
+        inputname.setPromptText("e.g. John Doe");
+        inputname.setMaxWidth(300);
+        inputname.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-background-radius: 20px; -fx-border-radius: 20px; -fx-border-color: #bdc3c7; -fx-border-width: 1px; -fx-background-color: white;");
+
+        loginArea.getChildren().addAll(nameLabel, inputname);
+
+        root.getChildren().addAll(title, boxes, loginArea);
+        
+        Scene login = new Scene(root, 900, 500); // Made the window slightly larger to breathe
+        
         title.getStyleClass().add("title");
-        login.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
         boxes.getStyleClass().add("person");
-        timname.setStyle("-fx-text-fill:black");
-        weiname.setStyle("-fx-text-fill:black");
-        kainame.setStyle("-fx-text-fill:black");
-        wongname.setStyle("-fx-text-fill:black");
-        // stage
+        try {
+            login.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+        } catch (Exception e) {
+            System.out.println("Could not load style.css");
+        }
+
         primaryStage.setScene(login);
-        primaryStage.setTitle("SMS");
+        primaryStage.setTitle("Stock Management System");
+        primaryStage.setResizable(false); // Keeps the layout from breaking
         primaryStage.show();
 
-        // managementsystem prompt declaration
-        Button view = new Button("view");
-        Button add = new Button("add");
-        Button deduct = new Button("deduct");
-        Button discontinue = new Button("discontinue");
+        Button view = createMenuButton("View Data");
+        Button add = createMenuButton("Add Stock");
+        Button deduct = createMenuButton("Deduct Stock");
+        Button discontinue = createMenuButton("Discontinue");
         Button[] buttonsarr = { view, add, deduct, discontinue };
 
-        // action
         UserInfo userInfo = new UserInfo();
         inputname.setOnAction(e -> {
-            userInfo.InputUserInfo(inputname.getText());
-            System.out.println("User ID set to: " + userInfo.getID());
+            String enteredName = inputname.getText().trim();
+            if (!enteredName.isEmpty()) {
+                userInfo.InputUserInfo(enteredName);
+                System.out.println("User ID set to: " + userInfo.getID());
 
-            // Once the ID is set, create and switch to the next scene
-            if (userInfo.getID() != null && !userInfo.getID().isEmpty()) {
                 StockManagement.getMaxProducts(primaryStage, login, userInfo.getID(), productsArray, totalProductsRef);
                 
-                root.getChildren().removeAll(name, inputname);
+                root.getChildren().remove(loginArea); // Remove the whole login area
+                title.setText("Welcome, " + userInfo.getID() + "!");
 
                 StackPane[] boxesArr = {box1, box2, box3, box4};
                 StockManagement.displayMenu(root, boxesArr, buttonsarr, title, userInfo.getID(), primaryStage);
-                
                 StockManagement.executeMenuChoice(buttonsarr, primaryStage, login, productsArray, totalProductsRef);
             }
         });
     }
 
 
+    private StackPane createCard(String text) {
+        StackPane card = new StackPane();
+        card.setPrefSize(180, 180);
+        card.setStyle("-fx-background-color: white; " +
+                      "-fx-background-radius: 15px; " +
+                      "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0, 5, 5);"); 
+        
+        Label label = new Label(text);
+        label.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #34495e;");
+        label.setWrapText(true);
+        label.setAlignment(Pos.CENTER);
+        
+        card.getChildren().add(label);
+        return card;
+    }
+
+    private Button createMenuButton(String text) {
+        Button btn = new Button(text);
+        btn.setStyle("-fx-background-color: transparent; " +
+                     "-fx-font-size: 20px; " +
+                     "-fx-font-weight: bold; " +
+                     "-fx-text-fill: #2980b9; " +
+                     "-fx-cursor: hand;");
+        return btn;
+    }
 
     public static void main(String[] args) {
         launch(args);
