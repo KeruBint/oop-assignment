@@ -70,7 +70,7 @@ public class StockManagement {
         Label welcomeLabel = new Label("Welcome, " + userId + "!\nDo you want to add new products?");
         welcomeLabel.setStyle("-fx-font-size: 18px; -fx-text-alignment: center; -fx-font-weight: bold;");
         welcomeLabel.setAlignment(Pos.CENTER);
-        welcomeLabel.setWrapText(true); // FIX: Ensures text doesn't cut off with "..."
+        welcomeLabel.setWrapText(true); 
 
         HBox buttons = new HBox(20);
         buttons.setAlignment(Pos.CENTER);
@@ -359,7 +359,6 @@ public class StockManagement {
 
         String actionCol = isAdd ? "Add Amount" : "Deduct Amount";
         
-        // FIX: Creating distinct tables for modifications so headers map correctly!
         GridPane fridgeTable = createProductTable(new String[]{"No.", "Item Num", "Name", "Door Design", "Color", "Capacity", "Qty", "Price", "Total Value", "Status", actionCol});
         GridPane tvTable = createProductTable(new String[]{"No.", "Item Num", "Name", "Screen Type", "Resolution", "Display Size", "Qty", "Price", "Total Value", "Status", actionCol});
         GridPane acTable = createProductTable(new String[]{"No.", "Item Num", "Name", "Cooling Cap", "Energy Rating", "Inverter", "Qty", "Price", "Total Value", "Status", actionCol});
@@ -556,8 +555,7 @@ public class StockManagement {
         root.setStyle("-fx-background-color: white; -fx-border-color: #bdc3c7;");
         for (int i = 0; i < headers.length; i++) {
             ColumnConstraints cc = new ColumnConstraints();
-            // FIX: Removed strict PercentWidth. Instead, allow columns to grow dynamically 
-            // and give them a reasonable minimum width so text never squishes or overlaps.
+ 
             cc.setHgrow(Priority.ALWAYS);
             cc.setMinWidth(80); 
             root.getColumnConstraints().add(cc);

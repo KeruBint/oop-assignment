@@ -25,15 +25,14 @@ public class MainApp extends Application {
             System.out.println("Could not load custom font, using default.");
         }
 
-        VBox root = new VBox(30); // 30px vertical spacing between elements
+        VBox root = new VBox(30); 
         root.setPadding(new Insets(40));
         root.setAlignment(Pos.CENTER);
-        root.setStyle("-fx-background-color: #f4f7f6;"); // Soft light-grey/blue background
-
+        root.setStyle("-fx-background-color: #f4f7f6;");
         Label title = new Label("Stock Management System");
         title.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
 
-        HBox boxes = new HBox(20); // 20px horizontal spacing between cards
+        HBox boxes = new HBox(20); 
         boxes.setAlignment(Pos.CENTER);
         
         StackPane box1 = createCard("Chan Tim How");
@@ -58,7 +57,7 @@ public class MainApp extends Application {
 
         root.getChildren().addAll(title, boxes, loginArea);
         
-        Scene login = new Scene(root, 900, 500); // Made the window slightly larger to breathe
+        Scene login = new Scene(root, 900, 500); 
         
         title.getStyleClass().add("title");
         boxes.getStyleClass().add("person");
@@ -70,7 +69,7 @@ public class MainApp extends Application {
 
         primaryStage.setScene(login);
         primaryStage.setTitle("Stock Management System");
-        primaryStage.setResizable(false); // Keeps the layout from breaking
+        primaryStage.setResizable(false);
         primaryStage.show();
 
         Button view = createMenuButton("View Data");
