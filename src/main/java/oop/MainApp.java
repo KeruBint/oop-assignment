@@ -22,18 +22,18 @@ public class MainApp extends Application {
         // declaration of login scene
         Font.loadFont(getClass().getResourceAsStream("fonnts.com-ultimate_serial-xlight.otf"), 14);
         VBox root = new VBox();
-        Label title = new Label("welcome to stock management system");
+        Label title = new Label("Welcome to stock management system!");
         HBox boxes = new HBox();
-        Label name = new Label("name");
+        Label name = new Label("Name");
         TextField inputname = new TextField();
         StackPane box1 = new StackPane();
         StackPane box2 = new StackPane();
         StackPane box3 = new StackPane();
         StackPane box4 = new StackPane();
-        Label timname = new Label("chan tim how");
-        Label weiname = new Label("chew wei jiun");
-        Label kainame = new Label("leong kai wen");
-        Label wongname = new Label("wong yu feng");
+        Label timname = new Label("Chan Tim How");
+        Label weiname = new Label("Chew Wei Jiun");
+        Label kainame = new Label("Leong Kaiwen");
+        Label wongname = new Label("Wong Yu Feng");
         // children
         VBox.setMargin(boxes, new Insets(50, 0, 0, 0));
         boxes.getChildren().addAll(box1, box2, box3, box4);
